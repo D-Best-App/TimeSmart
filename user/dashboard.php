@@ -5,7 +5,9 @@ error_reporting(E_ALL);
 
 require_once 'header.php';
 $empID = $_SESSION['EmployeeID'] ?? null;
-$name = $_SESSION['Name'] ?? 'User';
+$fullName = $_SESSION['Name'] ?? 'User';
+$nameParts = explode(' ', $fullName);
+$firstName = $nameParts[0];
 
 if (!$empID) {
     header('Location: ../error.php?code=401&message=' . urlencode('Employee ID not found. Please log in again.'));
@@ -28,12 +30,25 @@ while ($row = $result->fetch_assoc()) {
     $date = $row['Date'];
     $in   = $row['TimeIN'] ? strtotime($row['Date'] . ' ' . $row['TimeIN']) : 0;
     $out  = $row['TimeOUT'] ? strtotime($row['Date'] . ' ' . $row['TimeOUT']) : 0;
-    $worked = ($in && $out) ? $out - $in : 0;
+    
+    $lunchStart = $row['LunchStart'] ? strtotime($row['Date'] . ' ' . $row['LunchStart']) : 0;
+    $lunchEnd   = $row['LunchEnd'] ? strtotime($row['Date'] . ' ' . $row['LunchEnd']) : 0;
+    
+    $workDuration = ($in && $out) ? $out - $in : 0;
+    $lunchDuration = ($lunchStart && $lunchEnd) ? $lunchEnd - $lunchStart : 0;
+    
+    $worked = $workDuration - $lunchDuration;
+    if ($worked < 0) {
+        $worked = 0;
+    }
+    
     $totalSeconds += $worked;
 
     $punches[] = [
         'date' => date("m/d/Y", strtotime($date)),
         'in' => $in ? date("g:i A", $in) : '-',
+        'lunch_start' => $lunchStart ? date("g:i A", $lunchStart) : '-',
+        'lunch_end' => $lunchEnd ? date("g:i A", $lunchEnd) : '-',
         'out' => $out ? date("g:i A", $out) : '-',
         'hours' => $worked ? round($worked / 3600, 2) : '-',
         'note' => $row['Note'] ?? '-'
@@ -227,12 +242,14 @@ while ($row = $editResults->fetch_assoc()) {
             </form>
 
             <table>
-                <thead><tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Hours</th></tr></thead>
+                <thead><tr><th>Date</th><th>Time In</th><th>Lunch Start</th><th>Lunch End</th><th>Time Out</th><th>Hours</th></tr></thead>
                 <tbody>
                     <?php foreach ($punches as $p): ?>
                     <tr>
                         <td><?= $p['date'] ?></td>
                         <td><?= $p['in'] ?></td>
+                        <td><?= $p['lunch_start'] ?></td>
+                        <td><?= $p['lunch_end'] ?></td>
                         <td><?= $p['out'] ?></td>
                         <td><?= $p['hours'] ?></td>
                     </tr>
