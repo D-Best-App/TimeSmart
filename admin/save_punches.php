@@ -1,5 +1,11 @@
 <?php
 require_once '../auth/db.php';
+
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: no-referrer");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'");
+
 session_start();
 
 if (!isset($_SESSION['admin'])) {
