@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: timeclock_app
+    container_name: Company_Name_Timeclock
     ports:
       - "8080:80"
     environment:
