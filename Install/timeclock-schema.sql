@@ -1,7 +1,7 @@
 -- Timeclock schema (clean) — creates DB + tables (no data), then seeds admin
-CREATE DATABASE IF NOT EXISTS `timeclock`
+CREATE DATABASE IF NOT EXISTS `timeclock-company`
   CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `timeclock`;
+USE `timeclock-company`;
 
 -- Drop in FK-safe order
 SET FOREIGN_KEY_CHECKS = 0;
