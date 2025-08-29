@@ -1,4 +1,9 @@
 <?php
+// For debugging: uncomment the following lines to display errors
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
 // clock_action.php
 // --- SETUP AND DEPENDENCIES ---
 require_once __DIR__ . '/../auth/db.php';
@@ -27,12 +32,16 @@ function get_client_ip() {
  * @param int $http_code The HTTP status code to send.
  * @param string|null $log_error An optional internal error message to log.
  */
-function send_json_response($success, $message, $http_code = 200, $log_error = null) {
+function send_json_response($success, $message, $http_code = 200, $log_error = null, $data = []) {
     if ($log_error !== null) {
         error_log('TimeClock API Error: ' . $log_error);
     }
     http_response_code($http_code);
-    echo json_encode(['success' => $success, 'message' => $message]);
+    $response = ['success' => $success, 'message' => $message];
+    if (!empty($data)) {
+        $response = array_merge($response, $data);
+    }
+    echo json_encode($response);
     exit;
 }
 
@@ -397,9 +406,15 @@ switch ($action) {
         if ($userStatus !== 'In') { send_json_response(false, "⚠️ You must be clocked in to start lunch.", 400); }
         if (!$lastPunch || !empty($lastPunch['LunchStart'])) { send_json_response(false, "⚠️ No active punch, or lunch already started.", 400); }
         
-        $stmt = $conn->prepare("UPDATE timepunches SET LunchStart = ?, Note = CONCAT(Note, ?), LatitudeLunchStart = ?, LongitudeLunchStart = ?, AccuracyLunchStart = ?, IPAddressLunchStart = INET_ATON(?) WHERE EmployeeID = ? AND TimeOUT IS NULL");
-        $full_note = "\nLunch Start Note: " . $note;
-        $stmt->bind_param("ssdddsi", $now, $full_note, $lat, $lon, $accuracy, $ip, $empID);
+        if (!empty($note)) {
+            $stmt = $conn->prepare("UPDATE timepunches SET LunchStart = ?, Note = CONCAT(Note, ?), LatitudeLunchStart = ?, LongitudeLunchStart = ?, AccuracyLunchStart = ?, IPAddressLunchStart = INET_ATON(?) WHERE EmployeeID = ? AND TimeOUT IS NULL");
+            $full_note = "\nLunch Start Note: " . $note;
+            $stmt->bind_param("ssdddsi", $now, $full_note, $lat, $lon, $accuracy, $ip, $empID);
+        } else {
+            $stmt = $conn->prepare("UPDATE timepunches SET LunchStart = ?, LatitudeLunchStart = ?, LongitudeLunchStart = ?, AccuracyLunchStart = ?, IPAddressLunchStart = INET_ATON(?) WHERE EmployeeID = ? AND TimeOUT IS NULL");
+            $stmt->bind_param("sdddsi", $now, $lat, $lon, $accuracy, $ip, $empID);
+        }
+
         if (!$stmt->execute()) {
             send_json_response(false, "DB execute error (lunchstart)", 500, $stmt->error);
         }
@@ -416,9 +431,15 @@ switch ($action) {
         if ($userStatus !== 'Lunch') { send_json_response(false, "⚠️ You are not on lunch.", 400); }
         if (!$lastPunch || empty($lastPunch['LunchStart']) || !empty($lastPunch['LunchEnd'])) { send_json_response(false, "⚠️ No active lunch punch found.", 400); }
 
-        $stmt = $conn->prepare("UPDATE timepunches SET LunchEnd = ?, Note = CONCAT(Note, ?), LatitudeLunchEnd = ?, LongitudeLunchEnd = ?, AccuracyLunchEnd = ?, IPAddressLunchEnd = INET_ATON(?) WHERE EmployeeID = ? AND TimeOUT IS NULL");
-        $full_note = "\nLunch End Note: " . $note;
-        $stmt->bind_param("ssdddsi", $now, $full_note, $lat, $lon, $accuracy, $ip, $empID);
+        if (!empty($note)) {
+            $stmt = $conn->prepare("UPDATE timepunches SET LunchEnd = ?, Note = CONCAT(Note, ?), LatitudeLunchEnd = ?, LongitudeLunchEnd = ?, AccuracyLunchEnd = ?, IPAddressLunchEnd = INET_ATON(?) WHERE EmployeeID = ? AND TimeOUT IS NULL");
+            $full_note = "\nLunch End Note: " . $note;
+            $stmt->bind_param("ssdddsi", $now, $full_note, $lat, $lon, $accuracy, $ip, $empID);
+        } else {
+            $stmt = $conn->prepare("UPDATE timepunches SET LunchEnd = ?, LatitudeLunchEnd = ?, LongitudeLunchEnd = ?, AccuracyLunchEnd = ?, IPAddressLunchEnd = INET_ATON(?) WHERE EmployeeID = ? AND TimeOUT IS NULL");
+            $stmt->bind_param("sdddsi", $now, $lat, $lon, $accuracy, $ip, $empID);
+        }
+        
         if (!$stmt->execute()) { send_json_response(false, "DB execute error (lunchend)", 500, $stmt->error); }
 
         setClockStatus($conn, $empID, 'In');
@@ -455,7 +476,7 @@ switch ($action) {
             $stmt->bind_param("ssdsdddsi", $now, $lastPunch['LunchEnd'], $totalHours, $full_note, $lat, $lon, $accuracy, $ip, $empID);
         } else {
             $stmt = $conn->prepare("UPDATE timepunches SET TimeOUT = ?, LunchEnd = ?, TotalHours = ?, LatitudeOut = ?, LongitudeOut = ?, AccuracyOut = ?, IPAddressOut = INET_ATON(?) WHERE EmployeeID = ? AND TimeOUT IS NULL");
-            $stmt->bind_param("ssdddsii", $now, $lastPunch['LunchEnd'], $totalHours, $lat, $lon, $accuracy, $ip, $empID);
+            $stmt->bind_param("ssdddssi", $now, $lastPunch['LunchEnd'], $totalHours, $lat, $lon, $accuracy, $ip, $empID);
         }
 
         if (!$stmt->execute()) {
@@ -463,11 +484,11 @@ switch ($action) {
         }
 
         setClockStatus($conn, $empID, 'Out');
-        $message = "🕔 Clocked out at " . date("g:i A", strtotime($now)) . ". Total Hours: " . number_format($totalHours, 2);
+        $message = "🕔 Clocked out at " . date("g:i A", strtotime($now));
         if (logPendingEdit($conn, $empID, $date, 'TimeOut', $pendingTime, $note)) {
             $message .= " (submitted for approval)";
         }
-        send_json_response(true, $message);
+        send_json_response(true, $message, 200, null, ['hoursWorked' => number_format($totalHours, 2)]);
         break;
 
     default:

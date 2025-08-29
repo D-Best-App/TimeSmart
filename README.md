@@ -25,7 +25,7 @@ Follow these steps to set up D-BEST TimeSmart using Docker:
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/D-Best-App/Timesmart.git
+    git clone https://github.com/D-Best-Apps/Timesmart.git
     cd Timesmart
     ```
 

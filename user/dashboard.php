@@ -124,30 +124,47 @@ while ($row = $editResults->fetch_assoc()) {
 
     .current-status-badge {
         display: inline-block;
-        padding: 8px 12px;
+        padding: 20px;
         border-radius: 12px;
-        font-size: 1rem;
+        font-size: 17px;
         font-weight: bold;
         color: white;
         text-transform: uppercase;
+        background-color: #6c757d; /* Default/Disabled background */
     }
 
     .status-in {
         background-color: #28a745;
-        padding: 20px;
-        font-size: 17px;
     }
 
     .status-out {
         background-color: #dc3545;
-        padding: 20px;
-        font-size: 17px;
     }
 
     .status-on-lunch {
         background-color: #FFA500;
+    }
+
+    .popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .popup.hidden {
+        display: none;
+    }
+    .popup-content {
+        background-color: white;
         padding: 20px;
-        font-size: 17px;
+        border-radius: 5px;
+        text-align: center;
     }
 
 </style>
@@ -263,6 +280,22 @@ while ($row = $editResults->fetch_assoc()) {
             </table>
         </div>
         <?php endif; ?>
+<!-- Confirmation Popup -->
+<div id="confirmationPopup" class="popup hidden">
+  <div class="popup-content">
+    <p id="confirmationMessage"></p>
+    <button id="confirmYes">Yes</button>
+    <button id="confirmNo">No</button>
+  </div>
+</div>
+
+<!-- ✅ Feedback Popup -->
+<div id="customPopup" class="popup hidden">
+  <div class="popup-content">
+    <p id="popupMessage"></p>
+    <button id="popupClose">OK</button>
+  </div>
+</div>
 <script>const empID = <?= (int)$empID ?>;</script>
 <script src="../js/user_dashboard.js"></script>
 <?php require_once 'footer.php'; ?>

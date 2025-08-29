@@ -1,4 +1,10 @@
-<?php require './auth/db.php'; 
+<?php 
+// For debugging: uncomment the following lines to display errors
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
+require './auth/db.php'; 
 date_default_timezone_set('America/Chicago'); 
 
 
