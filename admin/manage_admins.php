@@ -7,22 +7,14 @@ if (!isset($_SESSION['admin'])) {
     exit;
 }
 
-// Add CSRF token generation for secure form submissions
-if (empty($_SESSION['csrf'])) {
-    $_SESSION['csrf'] = bin2hex(random_bytes(32));
-}
-
 // Handle deletion
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
-    if (hash_equals($_SESSION['csrf'] ?? '', $_POST['csrf'] ?? '')) {
-        $id = (int) $_POST['delete'];
-        $stmt = $conn->prepare("DELETE FROM admins WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        header("Location: manage_admins.php");
-        exit;
-    }
-    // Optionally handle CSRF failure, e.g., show an error.
+if (isset($_GET['delete'])) {
+    $id = (int) $_GET['delete'];
+    $stmt = $conn->prepare("DELETE FROM admins WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    header("Location: manage_admins.php");
+    exit;
 }
 
 // Fetch all admins
@@ -38,10 +30,13 @@ if ($result) {
 <head>
     <meta charset="UTF-8">
     <title>Manage Admins</title>
+    <link rel="icon" type="image/png" href="/images/D-Best.png">
+    <link rel="apple-touch-icon" href="/images/D-Best.png">
+    <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="../images/D-Best-favicon.png">
-    <link rel="icon" type="image/webp" href="../images/D-Best-favicon.webp">
     <link rel="apple-touch-icon" href="../images/D-Best-favicon.png">
     <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/webp" href="../images/D-Best-favicon.webp">
     <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
@@ -87,11 +82,7 @@ if ($result) {
                         <td><?= htmlspecialchars($admin['username']) ?></td>
                         <td>
                             <a class="btn-reset" style="background-color: var(--primary-color); color: white; margin-right: 0.5rem;" href="edit_admin.php?id=<?= $admin['id'] ?>">Edit</a>
-                            <form method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this admin?');">
-                                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'] ?? '') ?>">
-                                <input type="hidden" name="delete" value="<?= $admin['id'] ?>">
-                                <button type="submit" class="btn-reset" style="background-color: #dc3545; color: white;">Delete</button>
-                            </form>
+                            <a class="btn-reset" style="background-color: #dc3545; color: white;" href="?delete=<?= $admin['id'] ?>" onclick="return confirm('Are you sure you want to delete this admin?');">Delete</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

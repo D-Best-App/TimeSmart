@@ -1,11 +1,5 @@
 <?php
 require_once '../vendor/autoload.php';
-
-header("X-Frame-Options: DENY");
-header("X-Content-Type-Options: nosniff");
-header("Referrer-Policy: no-referrer");
-header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
-
 require_once '../auth/db.php';
 
 ini_set('display_errors', 1);

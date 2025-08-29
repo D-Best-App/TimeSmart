@@ -6,9 +6,6 @@ error_reporting(E_ALL);
 require_once '../auth/db.php';
 require_once __DIR__ . '/tcpdf/tcpdf.php';
 
-define('IN_ADMIN_PAGE', true);
-require_once './reports_helper.php';
-
 $start = $_POST['start'] ?? '';
 $end = $_POST['end'] ?? '';
 $emp = $_POST['emp'] ?? '';
@@ -20,10 +17,54 @@ if (!$start || !$end) {
     exit;
 }
 
-// === DATA FETCH ===
-$summaryData = getSummaryData($conn, $start, $end, $emp, $rounding);
-$grouped = $summaryData['grouped'];
-$totals = $summaryData['totals'];
+// Helper to convert HH:MM:SS to decimal and round
+function hmsToDecimal($time, $rounding = 0) {
+    list($h, $m, $s) = explode(':', $time);
+    $minutes = $h * 60 + $m + ($s / 60);
+    if ($rounding > 0) {
+        $minutes = round($minutes / $rounding) * $rounding;
+    }
+    return round($minutes / 60, 2);
+}
+
+// Fetch punches
+$sql = "
+    SELECT u.FirstName, u.LastName, tp.EmployeeID, tp.Date,
+           tp.TimeIN, tp.TimeOUT, tp.LunchStart, tp.LunchEnd,
+           SEC_TO_TIME(
+               TIME_TO_SEC(TIMEDIFF(tp.TimeOUT, tp.TimeIN)) -
+               TIME_TO_SEC(TIMEDIFF(IFNULL(tp.LunchEnd, '00:00:00'), IFNULL(tp.LunchStart, '00:00:00')))
+           ) AS TotalHours
+    FROM timepunches tp
+    JOIN users u ON u.ID = tp.EmployeeID
+    WHERE tp.TimeIN IS NOT NULL AND tp.TimeOUT IS NOT NULL
+      AND tp.Date BETWEEN ? AND ?
+";
+$params = [$start, $end];
+if (!empty($emp)) {
+    $sql .= " AND tp.EmployeeID = ?";
+    $params[] = $emp;
+}
+$sql .= " ORDER BY tp.EmployeeID, tp.Date ASC";
+
+$stmt = $conn->prepare($sql);
+$types = str_repeat('s', count($params));
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Organize rows
+$grouped = [];
+$totals = [];
+
+while ($row = $result->fetch_assoc()) {
+    $employeeKey = $row['EmployeeID'];
+    $rounded = hmsToDecimal($row['TotalHours'], $rounding);
+    $row['RoundedHours'] = $rounded;
+    $grouped[$employeeKey]['name'] = $row['FirstName'] . ' ' . $row['LastName'];
+    $grouped[$employeeKey]['rows'][] = $row;
+    $totals[$employeeKey] = ($totals[$employeeKey] ?? 0) + $rounded;
+}
 
 // PDF Setup
 $pdf = new TCPDF();

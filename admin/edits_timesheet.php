@@ -15,51 +15,28 @@ $stmt = $conn->prepare("SELECT pe.*, u.FirstName, u.LastName FROM pending_edits 
                         ORDER BY pe.SubmittedAt DESC");
 $stmt->execute();
 $result = $stmt->get_result();
-$pendingEdits = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
-
-$originals = [];
-if (!empty($pendingEdits)) {
-    // Collect unique (EmployeeID, Date) pairs to fetch original punches in one query
-    $punchKeys = [];
-    foreach ($pendingEdits as $edit) {
-        $punchKeys[] = [$edit['EmployeeID'], $edit['Date']];
-    }
-    $uniquePunchKeys = array_unique($punchKeys, SORT_REGULAR);
-
-    if (!empty($uniquePunchKeys)) {
-        $placeholders = implode(' OR ', array_fill(0, count($uniquePunchKeys), '(EmployeeID = ? AND Date = ?)'));
-        $params = array_merge(...$uniquePunchKeys);
-        $types = str_repeat('is', count($uniquePunchKeys));
-
-        $sql = "SELECT * FROM timepunches WHERE " . $placeholders;
-        $origStmt = $conn->prepare($sql);
-        $origStmt->bind_param($types, ...$params);
-        $origStmt->execute();
-        $originalsResult = $origStmt->get_result();
-        while ($originalRow = $originalsResult->fetch_assoc()) {
-            $key = $originalRow['EmployeeID'] . '|' . $originalRow['Date'];
-            $originals[$key] = $originalRow;
-        }
-        $origStmt->close();
-    }
-}
 
 $edits = [];
-foreach ($pendingEdits as $row) {
-    $key = $row['EmployeeID'] . '|' . $row['Date'];
-    $original = $originals[$key] ?? null;
+while ($row = $result->fetch_assoc()) {
+    $empID = $row['EmployeeID'];
+    $date = $row['Date'];
+
+    // Get original row from timepunches
+    $origStmt = $conn->prepare("SELECT * FROM timepunches WHERE EmployeeID = ? AND Date = ?");
+    $origStmt->bind_param("is", $empID, $date);
+    $origStmt->execute();
+    $original = $origStmt->get_result()->fetch_assoc();
 
     if (!$original) continue;
 
-    // Check the pending_edits. Corrected duplicated 'TimeIN' and typo 'TimeOut' to 'TimeOUT'.
-    foreach (['TimeIN', 'LunchStart', 'LunchEnd', 'TimeOUT'] as $field) {
+    // Check the pending_edits
+    foreach (['TimeIN', 'LunchStart', 'LunchEnd', 'TimeIN', 'TimeOut'] as $field) {
         if (array_key_exists($field, $row) && !is_null($row[$field]) && $row[$field] !== '' && $row[$field] !== $original[$field]) {
             $edits[] = [
                 'ID' => $row['ID'],
                 'FirstName' => $row['FirstName'],
                 'LastName' => $row['LastName'],
-                'Date' => $row['Date'],
+                'Date' => $date,
                 'Field' => $field,
                 'Original' => $original[$field] ?? '',
                 'Requested' => $row[$field],
@@ -75,10 +52,17 @@ foreach ($pendingEdits as $row) {
 <head>
     <meta charset="UTF-8">
     <title>Employee Punch Adjustments</title>
+    <link rel="icon" type="image/png" href="/images/D-Best.png">
+    <link rel="apple-touch-icon" href="/images/D-Best.png">
+    <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="../images/D-Best-favicon.png">
-    <link rel="icon" type="image/webp" href="../images/D-Best-favicon.webp">
     <link rel="apple-touch-icon" href="../images/D-Best-favicon.png">
     <link rel="manifest" href="/manifest.json">
+  <title>Employee Punch Adjustments</title>
+    <link rel="icon" type="image/png" href="../images/D-Best-favicon.png">
+    <link rel="apple-touch-icon" href="../images/D-Best-favicon.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/webp" href="../images/D-Best-favicon.webp">
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/edits_timesheet.css">
 </head>
