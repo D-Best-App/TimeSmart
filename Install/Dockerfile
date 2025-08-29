@@ -28,7 +28,7 @@ WORKDIR /var/www/html
 RUN git config --global --add safe.directory /var/www/html
 
 # Clone the repository
-RUN find . -mindepth 1 -delete && git clone https://github.com/D-Best-Apps/Timesmart.git .
+RUN find . -mindepth 1 -delete && git clone https://github.com/D-Best-App/Timesmart.git .
 
 # Install Composer dependencies
 RUN composer install --no-dev --optimize-autoloader
