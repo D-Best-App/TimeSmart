@@ -1,3 +1,4 @@
-CREATE USER 'timeclock'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON *.* TO 'timeclock'@'localhost' WITH GRANT OPTION;
+CREATE USER 'timeclock'@'%' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON *.* TO 'timeclock'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
+
