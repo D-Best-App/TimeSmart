@@ -18,7 +18,10 @@ read -p "Enter the company name: " company_name
 mkdir "Timeclock-$company_name"
 cd "Timeclock-$company_name"
 
-# No need to clone the repository, as we are using a pre-built image.
+# Download necessary files from GitHub
+echo "Downloading necessary files from GitHub..."
+curl -L https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/docker-compose.yml -o docker-compose.yml
+curl -L https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/timeclock-schema.sql -o timeclock-schema.sql
 
 # Ask for database credentials
 read -p "Enter database host: " db_host
@@ -31,12 +34,12 @@ read -p "Create Docker container named 'Timeclock-$company_name'? (y/n): " creat
 if [ "$create_docker" == "y" ]; then
     echo "Creating Docker container..."
     # Modify the docker-compose.yml to use the company name and database credentials
-    sed -i "s/COMPANY_NAME_PLACEHOLDER/Timeclock-$company_name/g" Install/docker-compose.yml
-    sed -i "s/DB_HOST_PLACEHOLDER/$db_host/g" Install/docker-compose.yml
-    sed -i "s/DB_NAME_PLACEHOLDER/timeclock-$company_name/g" Install/docker-compose.yml
-    sed -i "s/DB_USER_PLACEHOLDER/$db_user/g" Install/docker-compose.yml
-    sed -i "s/DB_PASS_PLACEHOLDER/$db_pass/g" Install/docker-compose.yml
-    docker compose -f Install/docker-compose.yml up -d
+    sed -i "s/COMPANY_NAME_PLACEHOLDER/Timeclock-$company_name/g" docker-compose.yml
+    sed -i "s/DB_HOST_PLACEHOLDER/$db_host/g" docker-compose.yml
+    sed -i "s/DB_NAME_PLACEHOLDER/timeclock-$company_name/g" docker-compose.yml
+    sed -i "s/DB_USER_PLACEHOLDER/$db_user/g" docker-compose.yml
+    sed -i "s/DB_PASS_PLACEHOLDER/$db_pass/g" docker-compose.yml
+    docker compose -f docker-compose.yml up -d
 fi
 
 # Ask to create database
@@ -44,9 +47,9 @@ read -p "Create database named 'timeclock-$company_name'? (y/n): " create_databa
 if [ "$create_database" == "y" ]; then
     echo "Creating database..."
 
-    sed "s/DB_NAME_PLACEHOLDER/timeclock-$company_name/g" Install/timeclock-schema.sql > Install/timeclock-schema-temp.sql
-    mysql -h "$db_host" -u "$db_user" -p"$db_pass" < Install/timeclock-schema-temp.sql
-    rm Install/timeclock-schema-temp.sql
+    sed "s/DB_NAME_PLACEHOLDER/timeclock-$company_name/g" timeclock-schema.sql > timeclock-schema-temp.sql
+    mysql -h "$db_host" -u "$db_user" -p"$db_pass" < timeclock-schema-temp.sql
+    rm timeclock-schema-temp.sql
 fi
 
 echo "Installation complete."
