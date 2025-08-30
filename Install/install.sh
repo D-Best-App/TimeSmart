@@ -52,4 +52,47 @@ if [ "$create_database" == "y" ]; then
     rm timeclock-schema-temp.sql
 fi
 
+# Ask to create backup script
+read -p "Create backup script and cron job? (y/n): " create_backup
+if [ "$create_backup" == "y" ]; then
+    echo "Creating backup script..."
+
+    # Create backup directories
+    mkdir -p "/var/sql-data/$company_name/daily-backup"
+
+    # Create backup script
+    cat << EOF > /usr/local/bin/backup.sh
+#!/bin/bash
+
+DB_USER="$db_user"
+DB_PASS="$db_pass"
+DB_HOST="$db_host"
+DB_NAME="timeclock-$company_name"
+COMPANY_NAME="$company_name"
+BACKUP_DIR="/var/sql-data/\$COMPANY_NAME"
+DAILY_BACKUP_DIR="\$BACKUP_DIR/daily-backup"
+DATE=\$(date +"%Y-%m-%d_%H-%M-%S")
+HOUR=\$(date +"%H")
+
+# Hourly backup
+mysqldump -h"\$DB_HOST" -u"\$DB_USER" -p"\$DB_PASS" "\$DB_NAME" > "\$BACKUP_DIR/\$DB_NAME-\$DATE.sql"
+
+# Rotate hourly backups (keep last 8)
+ls -1t "\$BACKUP_DIR"/*.sql | tail -n +9 | xargs -I {} rm -- {}
+
+# Daily backup at 8 PM (20:00)
+if [ "\$HOUR" -eq 20 ]; then
+    cp "\$BACKUP_DIR/\$DB_NAME-\$DATE.sql" "\$DAILY_BACKUP_DIR/\$DB_NAME-\$DATE.sql"
+fi
+EOF
+
+    # Make backup script executable
+    chmod +x /usr/local/bin/backup.sh
+
+    # Add cron job
+    (crontab -l 2>/dev/null; echo "0 * * * * /usr/local/bin/backup.sh") | crontab -
+
+    echo "Backup script and cron job created."
+fi
+
 echo "Installation complete."
