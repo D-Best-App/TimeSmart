@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: dbest25/timesmart:latest
     container_name: COMPANY_NAME_PLACEHOLDER
     # ports:
     #   - "8080:80"

@@ -18,9 +18,7 @@ read -p "Enter the company name: " company_name
 mkdir "Timeclock-$company_name"
 cd "Timeclock-$company_name"
 
-# Clone the repository
-echo "Cloning the repository..."
-git clone https://github.com/D-Best-App/Timesmart.git .
+# No need to clone the repository, as we are using a pre-built image.
 
 # Ask for database credentials
 read -p "Enter database host: " db_host
@@ -38,7 +36,7 @@ if [ "$create_docker" == "y" ]; then
     sed -i "s/DB_NAME_PLACEHOLDER/timeclock-$company_name/g" Install/docker-compose.yml
     sed -i "s/DB_USER_PLACEHOLDER/$db_user/g" Install/docker-compose.yml
     sed -i "s/DB_PASS_PLACEHOLDER/$db_pass/g" Install/docker-compose.yml
-    docker compose -f Install/docker-compose.yml up -d --build
+    docker compose -f Install/docker-compose.yml up -d
 fi
 
 # Ask to create database

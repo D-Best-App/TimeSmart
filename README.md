@@ -16,7 +16,6 @@ D-BEST TimeSmart is a web-based time clock application designed to manage employ
 Before you begin, ensure you have the following installed on your system:
 
 *   **Docker:** For running the application in a container.
-*   **Git:** For cloning the repository.
 *   **MySQL Client:** For creating the database.
 
 ## Installation
@@ -38,7 +37,7 @@ Follow these steps to set up D-BEST TimeSmart using the installation script:
     The script will guide you through the following steps:
     *   **Enter the company name:** This will be used to name the Docker container and the database.
     *   **Enter database credentials:** You will be prompted to enter the database host, user, and password.
-    *   **Create Docker container:** The script will ask for confirmation to create the Docker container.
+    *   **Create Docker container:** The script will ask for confirmation to create the Docker container. The script will pull the `dbest25/timesmart:latest` Docker image.
     *   **Create database:** The script will ask for confirmation to create the database.
 
 3.  **Access the Application:**
@@ -69,7 +68,6 @@ Follow these steps to set up D-BEST TimeSmart using the installation script:
 ## Troubleshooting
 
 *   **`docker: command not found`:** Ensure that you have Docker installed correctly.
-*   **`git: command not found`:** Ensure that you have Git installed correctly.
 *   **`mysql: command not found`:** Ensure that you have the MySQL client installed correctly.
 *   **Database Connection Error:** Double-check your database credentials during the installation process.
 
@@ -77,3 +75,6 @@ Follow these steps to set up D-BEST TimeSmart using the installation script:
 
 Contributions are welcome! Please feel free to fork the repository, make your changes, and submit a pull request.
 
+## License
+
+[Specify your license here, e.g., MIT License]
