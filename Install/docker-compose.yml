@@ -12,6 +12,7 @@ services:
       DB_USER: DB_USER_PLACEHOLDER
       DB_PASS: DB_PASS_PLACEHOLDER
       DB_TIMEZONE: America/Chicago
+    network_mode: bridge
 
 # db:
 #   image: mariadb:latest
