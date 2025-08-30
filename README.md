@@ -81,7 +81,7 @@ http://<container_ip>
 - URL: `http://<container_ip>/admin/login.php`
 - **Default Credentials:**
   - Username: `admin`
-  - Password: `password`
+  - Password: `admin`
 
 You should change this password immediately after first login.
 
