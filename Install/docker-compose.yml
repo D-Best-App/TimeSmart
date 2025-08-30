@@ -12,8 +12,6 @@ services:
       DB_USER: DB_USER_PLACEHOLDER
       DB_PASS: DB_PASS_PLACEHOLDER
       DB_TIMEZONE: America/Chicago
-    networks:
-      - timeclock_network
 
 # db:
 #   image: mariadb:latest
@@ -26,9 +24,3 @@ services:
 #     MYSQL_PASSWORD: DB_PASS_PLACEHOLDER
 #   volumes:
 #     - ./timeclock-schema.sql:/docker-entrypoint-initdb.d/init.sql
-#   networks:
-#     - timeclock_network
-
-networks:
-  timeclock_network:
-    driver: bridge

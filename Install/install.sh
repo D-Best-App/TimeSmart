@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Check if Docker is installed and running
+if ! [ -x "$(command -v docker)" ]; then
+    echo "Error: Docker is not installed." >&2
+    exit 1
+fi
+
+if ! docker info > /dev/null 2>&1; then
+    echo "Error: Docker is not running." >&2
+    exit 1
+fi
+
 # Ask for the company name
 read -p "Enter the company name: " company_name
 
@@ -27,7 +38,7 @@ if [ "$create_docker" == "y" ]; then
     sed -i "s/DB_NAME_PLACEHOLDER/timeclock-$company_name/g" Install/docker-compose.yml
     sed -i "s/DB_USER_PLACEHOLDER/$db_user/g" Install/docker-compose.yml
     sed -i "s/DB_PASS_PLACEHOLDER/$db_pass/g" Install/docker-compose.yml
-    docker-compose -f Install/docker-compose.yml up -d --build
+    docker compose -f Install/docker-compose.yml up -d --build
 fi
 
 # Ask to create database
