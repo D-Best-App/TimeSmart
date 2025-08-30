@@ -3,14 +3,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: COMPANY_NAME_PLACEHOLDER
+    container_name: Company_Name_Timeclock
     ports:
       - "8080:80"
     environment:
-      DB_HOST: DB_HOST_PLACEHOLDER
-      DB_NAME: DB_NAME_PLACEHOLDER
-      DB_USER: DB_USER_PLACEHOLDER
-      DB_PASS: DB_PASS_PLACEHOLDER
+      DB_HOST: host.docker.internal
+      DB_NAME: timeclock
+      DB_USER: timeclock
+      DB_PASS: Password
       DB_TIMEZONE: America/Chicago
     networks:
       - timeclock_network
@@ -20,10 +20,10 @@ services:
 #   container_name: timeclock_db
 #   restart: unless-stopped
 #   environment:
-#     MYSQL_ROOT_PASSWORD: DB_PASS_PLACEHOLDER
-#     MYSQL_DATABASE: DB_NAME_PLACEHOLDER
-#     MYSQL_USER: DB_USER_PLACEHOLDER
-#     MYSQL_PASSWORD: DB_PASS_PLACEHOLDER
+#     MYSQL_ROOT_PASSWORD: Password
+#     MYSQL_DATABASE: timeclock
+#     MYSQL_USER: timeclock
+#     MYSQL_PASSWORD: Password
 #   volumes:
 #     - ./timeclock-schema.sql:/docker-entrypoint-initdb.d/init.sql
 #   networks:
