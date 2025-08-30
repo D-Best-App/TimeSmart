@@ -16,67 +16,58 @@ D-BEST TimeSmart is a web-based time clock application designed to manage employ
 Before you begin, ensure you have the following installed on your system:
 
 *   **Docker:** For running the application in a container.
-*   **Docker Compose:** For managing the Docker containers.
+*   **Git:** For cloning the repository.
+*   **MySQL Client:** For creating the database.
 
 ## Installation
 
-Follow these steps to set up D-BEST TimeSmart using Docker:
+Follow these steps to set up D-BEST TimeSmart using the installation script:
 
-1.  **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/D-Best-Apps/Timesmart.git
-    cd Timesmart
-    ```
-
-2.  **Create a `.env` file for Docker Compose:**
-
-    In the `Install` directory, create a `.env` file containing your database credentials. Docker Compose will read this file and inject the variables into the running container:
-
-    ```
-    DB_HOST=your_database_host
-    DB_USER=your_database_user
-    DB_PASS=your_database_password
-    DB_NAME=your_database_name
-    DB_TIMEZONE=America/Chicago
-    ```
-
-3.  **Database Setup:**
-
-    This Docker setup does not include a database. You will need to provide your own MySQL or MariaDB database. Once you have created your database, you can import the database schema from the `Install/timeclock-schema.sql` file. This will create the necessary tables and seed them with some initial data.
-
-4.  **Build and Run the Application:**
-
-    From the `Install` directory, run the following command to build and start the application:
+1.  **Run the installation script:**
 
     ```bash
-    docker-compose up -d
+    bash <(curl -s https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/install.sh)
     ```
 
-5.  **Access the Application:**
+2.  **Follow the on-screen prompts:**
 
-    *   Open your web browser and navigate to `http://localhost:8080`.
+    The script will guide you through the following steps:
+    *   **Enter the company name:** This will be used to name the Docker container and the database.
+    *   **Enter database credentials:** You will be prompted to enter the database host, user, and password.
+    *   **Create Docker container:** The script will ask for confirmation to create the Docker container.
+    *   **Create database:** The script will ask for confirmation to create the database.
+
+3.  **Access the Application:**
+
+    Once the installation is complete, you can access the application. Since the container is running in bridge mode and the port is not exposed, you will need to find the IP address of the container to access it.
+
+    You can find the IP address of the container by running the following command:
+
+    ```bash
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_name>
+    ```
+
+    Replace `<container_name>` with the name of the container (e.g., `Timeclock-YourCompanyName`).
+
+    Open your web browser and navigate to `http://<container_ip_address>`.
 
 ## Usage
 
 *   **Admin Login:**
-    *   Navigate to `http://localhost:8080/admin/login.php` to access the admin login page.
+    *   Navigate to `http://<container_ip_address>/admin/login.php` to access the admin login page.
     *   The default admin credentials are:
         *   **Username:** admin
         *   **Password:** password
 *   **Employee Login:**
-    *   Navigate to `http://localhost:8080/user/login.php` to access the employee login page.
+    *   Navigate to `http://<container_ip_address>/user/login.php` to access the employee login page.
     *   Employees can log in with the credentials created by the administrator.
 
 ## Troubleshooting
 
-*   **`docker-compose up` fails:** Ensure that you have Docker and Docker Compose installed correctly. Also, make sure that you are in the `Install` directory when you run the command.
-*   **Database Connection Error:** Double-check your database credentials in the `.env` file used by Docker Compose.
-*   **Page Not Found (404):** Ensure that the application is running correctly by checking the Docker logs:
-
-    ```bash
-    docker-compose logs -f
-    ```
+*   **`docker: command not found`:** Ensure that you have Docker installed correctly.
+*   **`git: command not found`:** Ensure that you have Git installed correctly.
+*   **`mysql: command not found`:** Ensure that you have the MySQL client installed correctly.
+*   **Database Connection Error:** Double-check your database credentials during the installation process.
 
 ## Contributing
 
