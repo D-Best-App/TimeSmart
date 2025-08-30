@@ -77,6 +77,3 @@ Follow these steps to set up D-BEST TimeSmart using the installation script:
 
 Contributions are welcome! Please feel free to fork the repository, make your changes, and submit a pull request.
 
-## License
-
-[Specify your license here, e.g., MIT License]
