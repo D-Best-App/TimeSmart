@@ -23,10 +23,14 @@ Before you begin, ensure you have the following installed on your system:
 
 Follow these steps to set up D-BEST TimeSmart using the installation script:
 
-1.  **Run the installation script:**
+1.  **Download and run the installation script:**
+
+    You will need to have `root` or `sudo` privileges to run the installation script.
 
     ```bash
-    bash <(curl -s https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/install.sh)
+    curl -o install.sh https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/install.sh
+    chmod +x install.sh
+    sudo ./install.sh
     ```
 
 2.  **Follow the on-screen prompts:**
