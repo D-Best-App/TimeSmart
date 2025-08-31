@@ -103,6 +103,7 @@ while ($row = $offices_result->fetch_assoc()) {
     <div class="uman-header">
         <h2>User Management</h2>
         <button class="btn primary" onclick="document.getElementById('addUserModal').style.display='block'">+ Add User</button>
+        <a href="archived_users.php" class="btn">View Archived Users</a>
     </div>
 
     <form method="POST" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
@@ -158,7 +159,7 @@ while ($row = $offices_result->fetch_assoc()) {
                     <button class="btn warning small" onclick="location.href='edit_user.php?id=<?= (int)$user['ID'] ?>'">Edit</button>
                     <button class="btn danger small" onclick="showResetModal(<?= (int)$user['ID'] ?>)">Reset</button>
                     <button class="btn small" onclick="open2FAModal(<?= (int)$user['ID'] ?>)">2FA Options</button>
-                    <button class="btn small" onclick="showArchiveModal(<?= (int)$user['ID'] ?>)">Archive</button>
+                    <button class="btn warning small" onclick="showArchiveModal(<?= (int)$user['ID'] ?>)">Archive</button>
                     <button class="btn danger small" onclick="showDeleteModal(<?= (int)$user['ID'] ?>)">Delete</button>
                 </td>
             </tr>
