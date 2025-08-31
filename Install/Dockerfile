@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     libzip-dev \
     unzip \
+    nano \
     libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -41,3 +42,5 @@ EXPOSE 80
 
 # Run Supervisor to start Nginx and PHP-FPM
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+ENTRYPOINT []
