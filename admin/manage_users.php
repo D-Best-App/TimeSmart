@@ -159,7 +159,7 @@ while ($row = $offices_result->fetch_assoc()) {
                     <button class="btn warning small" onclick="location.href='edit_user.php?id=<?= (int)$user['ID'] ?>'">Edit</button>
                     <button class="btn danger small" onclick="showResetModal(<?= (int)$user['ID'] ?>)">Reset</button>
                     <button class="btn small" onclick="open2FAModal(<?= (int)$user['ID'] ?>)">2FA Options</button>
-                    <button class="btn warning small" onclick="showArchiveModal(<?= (int)$user['ID'] ?>)">Archive</button>
+                    <button class="btn primary small" onclick="showArchiveModal(<?= (int)$user['ID'] ?>)">Archive</button>
                     <button class="btn danger small" onclick="showDeleteModal(<?= (int)$user['ID'] ?>)">Delete</button>
                 </td>
             </tr>
@@ -225,7 +225,7 @@ while ($row = $offices_result->fetch_assoc()) {
     </div>
 </div>
 
-<script src="../js/manage_users.js"></script>
+<script src="../js/manage_users.js?v=1.1"></script>
 
 <!-- Archive User Modal -->
 <div id="archiveModal" class="modal">
