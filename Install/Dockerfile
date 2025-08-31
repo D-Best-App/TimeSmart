@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     libzip-dev \
     unzip \
+    nano \
     libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
