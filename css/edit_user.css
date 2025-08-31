@@ -1,4 +1,4 @@
-    body {
+body {
         font-family: 'Segoe UI', sans-serif;
         background-color: #f4f6f9;
         margin: 0;
@@ -7,7 +7,7 @@
     }
 
     .banner {
-        background-color: #0078D7;
+        background-color: #000080;
         color: white;
         padding: 1.5rem;
         text-align: center;
@@ -117,7 +117,7 @@
     }
 
     input:checked + .slider {
-        background-color: #0078D7;
+        background-color: #000080;
     }
 
     input:checked + .slider:before {
@@ -140,7 +140,7 @@
     }
 
     .btn.primary {
-        background-color: #0078D7;
+        background-color: #000080;
         color: white;
     }
 

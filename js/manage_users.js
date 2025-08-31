@@ -65,3 +65,19 @@ function showDeleteModal(userId) {
 function closeDeleteModal() {
     document.getElementById('deleteModal').style.display = 'none';
 }
+
+function toggleActionsMenu(button) {
+    button.parentElement.classList.toggle('active');
+}
+
+window.onclick = function(event) {
+  if (!event.target.matches('.actions-menu button')) {
+    var dropdowns = document.getElementsByClassName("actions-menu");
+    for (var i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('active')) {
+        openDropdown.classList.remove('active');
+      }
+    }
+  }
+}

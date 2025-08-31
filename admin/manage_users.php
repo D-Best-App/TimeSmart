@@ -156,11 +156,16 @@ while ($row = $offices_result->fetch_assoc()) {
                     </form>
                 </td>
                 <td>
-                    <button class="btn warning small" onclick="location.href='edit_user.php?id=<?= (int)$user['ID'] ?>'">Edit</button>
-                    <button class="btn danger small" onclick="showResetModal(<?= (int)$user['ID'] ?>)">Reset</button>
-                    <button class="btn small" onclick="open2FAModal(<?= (int)$user['ID'] ?>)">2FA Options</button>
-                    <button class="btn primary small" onclick="showArchiveModal(<?= (int)$user['ID'] ?>)">Archive</button>
-                    <button class="btn danger small" onclick="showDeleteModal(<?= (int)$user['ID'] ?>)">Delete</button>
+                    <div class="actions-menu">
+                        <button class="btn small primary" onclick="toggleActionsMenu(this)">Actions</button>
+                        <div class="actions-menu-content">
+                            <button class="btn" onclick="location.href='edit_user.php?id=<?= (int)$user['ID'] ?>'">Edit</button>
+                            <button class="btn" onclick="showResetModal(<?= (int)$user['ID'] ?>)">Reset</button>
+                            <button class="btn" onclick="open2FAModal(<?= (int)$user['ID'] ?>)">2FA Options</button>
+                            <button class="btn" onclick="showArchiveModal(<?= (int)$user['ID'] ?>)">Archive</button>
+                            <button class="btn" onclick="showDeleteModal(<?= (int)$user['ID'] ?>)">Delete</button>
+                        </div>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>
