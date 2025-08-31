@@ -41,3 +41,5 @@ EXPOSE 80
 
 # Run Supervisor to start Nginx and PHP-FPM
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+ENTRYPOINT []
