@@ -70,10 +70,10 @@ if ($statsResult && $statsRow = $statsResult->fetch_assoc()) {
 </header>
 
 <div class="info-stats">
-    <div class="info-card pending">
+    <a href="edits_timesheet.php" class="info-card pending">
         <h3>Needs Approval</h3>
         <div class="count"><?= $pendingCount ?></div>
-    </div>
+    </a>
     <div class="info-card users">
         <h3>Total Users</h3>
         <div class="count"><?= $totalUsers ?></div>
@@ -103,6 +103,11 @@ if ($statsResult && $statsRow = $statsResult->fetch_assoc()) {
             <h2>Manage Users</h2>
             <p>Add, edit, or remove employee accounts.</p>
             <a href="manage_users.php">Open</a>
+        </div>
+        <div class="card">
+            <h2>Manage Offices</h2>
+            <p>Add, edit, or remove office locations.</p>
+            <a href="manage_offices.php">Open</a>
         </div>
         <div class="card">
             <h2>Manage Admins</h2>

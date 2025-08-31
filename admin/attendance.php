@@ -148,6 +148,7 @@ if ($exportPDF) {
     <a href="view_punches.php">Timesheets</a>
     <a href="summary.php">Summary</a>
     <a href="manage_users.php">Users</a>
+    <a href="manage_offices.php">Offices</a>
     <a href="attendance.php" class="active">Attendance</a>
     <a href="manage_admins.php">Admins</a>
     <a href="../logout.php">Logout</a>
