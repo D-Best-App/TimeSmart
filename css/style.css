@@ -16,9 +16,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #126ab3;
+  background-color: #000080;
   padding: 12px 20px;
-  color: white;
+  color: #FFFFFF;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex-wrap: wrap;
 }
@@ -47,7 +47,7 @@ body {
 
 .nav-date {
   font-size: 14px;
-  color: #e3e3e3;
+  color: #FFFFFF;
 }
 
 .topnav a,
@@ -373,7 +373,7 @@ input[type="time"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #126ab3;
+    background-color: #000080;
     color: white;
     padding: 10px 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -396,7 +396,7 @@ input[type="time"] {
     left: 0;
     right: 0;
     height: 60px;
-    background-color: #126ab3;
+    background-color: #000080;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -404,9 +404,9 @@ input[type="time"] {
     box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
   }
 
-  .mobile-nav a,
+    .mobile-nav a,
   .mobile-nav .dropbtn {
-    color: white;
+    color: #FFFFFF;
     font-size: 20px;
     text-decoration: none;
     background: none;
@@ -499,8 +499,8 @@ input[type="time"] {
 }
 
 footer {
-  background-color: #126ab3;
-  color: white;
+  background-color: #000080;
+  color: #FFFFFF;
   text-align: center;
   padding: 1rem 2rem;
   font-size: 14px;
@@ -508,7 +508,7 @@ footer {
 }
 
 footer a {
-  color: #e0e0e0;
+  color: #FFFFFF;
   text-decoration: none;
   margin: 0 10px;
 }
