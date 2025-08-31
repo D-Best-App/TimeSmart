@@ -129,8 +129,6 @@ CREATE TABLE `login_logs` (
   CONSTRAINT `login_logs_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `users` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 CREATE TABLE `Offices` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `OfficeName` varchar(255) NOT NULL,
