@@ -159,3 +159,6 @@ CREATE TABLE `user-archive` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ===== Seed default admin (bcrypt hash) =====
+INSERT INTO `admins` (`username`, `password`)
+VALUES ('admin', '$2a$10$bHLa.Sk0R08YNno3Y1cynu.tpk9ADCZitUuXkyXAqImWh.BC1KliG')
+ON DUPLICATE KEY UPDATE `password` = VALUES(`password`);
