@@ -1,6 +1,6 @@
 services:
   app:
-    image: dbest25/timesmart:latest
+    image: dbest25/timesmart:beta
     container_name: COMPANY_NAME_PLACEHOLDER
     # ports:
     #   - "8080:80"
