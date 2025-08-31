@@ -169,7 +169,7 @@ $gpsEnforced  = isset($gpsSetting['SettingValue']) && $gpsSetting['SettingValue'
             <select name="Office" required>
                 <option value="">Select Office</option>
                 <option value="Fort Smith">Fort Smith</option>
-                <option value="Fayetteville">Fayetteville</option>
+                <option value="Springdale">Springdale</option>
                 <option value="Overseas">Overseas</option>
             </select>
             <input type="password" name="Password" placeholder="Initial Password" required>

@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label>Office
             <select name="Office" required>
                 <option value="Fort Smith" <?= $user['Office'] === 'Fort Smith' ? 'selected' : '' ?>>Fort Smith</option>
-                <option value="Fayetteville" <?= $user['Office'] === 'Fayetteville' ? 'selected' : '' ?>>Fayetteville</option>
+                <option value="Springdale" <?= $user['Office'] === 'Springdale' ? 'selected' : '' ?>>Springdale</option>
                 <option value="Overseas" <?= $user['Office'] === 'Overseas' ? 'selected' : '' ?>>Overseas</option>
             </select>
         </label>
