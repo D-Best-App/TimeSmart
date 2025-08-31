@@ -40,6 +40,12 @@ while ($row = $users_result->fetch_assoc()) {
 
 $gpsSetting   = $conn->query("SELECT SettingValue FROM settings WHERE SettingKey = 'EnforceGPS'")->fetch_assoc();
 $gpsEnforced  = isset($gpsSetting['SettingValue']) && $gpsSetting['SettingValue'] === '1';
+
+$offices_result = $conn->query("SELECT OfficeName FROM Offices ORDER BY OfficeName");
+$offices_data = [];
+while ($row = $offices_result->fetch_assoc()) {
+    $offices_data[] = $row;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,6 +72,7 @@ $gpsEnforced  = isset($gpsSetting['SettingValue']) && $gpsSetting['SettingValue'
         <a href="summary.php">Summary</a>
         <a href="reports.php">Reports</a>
         <a href="manage_users.php" class="active">Users</a>
+        <a href="manage_offices.php">Offices</a>
         <a href="attendance.php">Attendance</a>
         <a href="manage_admins.php">Admins</a>
         <a href="../logout.php">Logout</a>
@@ -151,6 +158,8 @@ $gpsEnforced  = isset($gpsSetting['SettingValue']) && $gpsSetting['SettingValue'
                     <button class="btn warning small" onclick="location.href='edit_user.php?id=<?= (int)$user['ID'] ?>'">Edit</button>
                     <button class="btn danger small" onclick="showResetModal(<?= (int)$user['ID'] ?>)">Reset</button>
                     <button class="btn small" onclick="open2FAModal(<?= (int)$user['ID'] ?>)">2FA Options</button>
+                    <button class="btn small" onclick="showArchiveModal(<?= (int)$user['ID'] ?>)">Archive</button>
+                    <button class="btn danger small" onclick="showDeleteModal(<?= (int)$user['ID'] ?>)">Delete</button>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -168,9 +177,9 @@ $gpsEnforced  = isset($gpsSetting['SettingValue']) && $gpsSetting['SettingValue'
             <input type="text" name="TagID" placeholder="Tag ID">
             <select name="Office" required>
                 <option value="">Select Office</option>
-                <option value="Fort Smith">Fort Smith</option>
-                <option value="Springdale">Springdale</option>
-                <option value="Overseas">Overseas</option>
+                <?php foreach ($offices_data as $office): ?>
+                    <option value="<?= htmlspecialchars($office['OfficeName']) ?>"><?= htmlspecialchars($office['OfficeName']) ?></option>
+                <?php endforeach; ?>
             </select>
             <input type="password" name="Password" placeholder="Initial Password" required>
             <div class="modal-actions">
@@ -216,5 +225,35 @@ $gpsEnforced  = isset($gpsSetting['SettingValue']) && $gpsSetting['SettingValue'
 </div>
 
 <script src="../js/manage_users.js"></script>
+
+<!-- Archive User Modal -->
+<div id="archiveModal" class="modal">
+    <div class="modal-content">
+        <h3>Archive User</h3>
+        <p>Are you sure you want to archive this user? This will remove them from the active user list, but their data will be kept in the archive.</p>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeArchiveModal()">Cancel</button>
+            <form id="archiveForm" action="archive_user.php" method="POST" style="display:inline;">
+                <input type="hidden" name="ID" id="archiveUserId">
+                <button type="submit" class="btn primary">Yes, Archive</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete User Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h3>Delete User</h3>
+        <p>Are you sure you want to permanently delete this user? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeDeleteModal()">Cancel</button>
+            <form id="deleteForm" action="delete_user.php" method="POST" style="display:inline;">
+                <input type="hidden" name="ID" id="deleteUserId">
+                <button type="submit" class="btn danger">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
