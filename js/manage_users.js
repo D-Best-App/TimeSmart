@@ -45,3 +45,23 @@ function confirm2FA(action) {
         form.submit();
     }
 }
+
+// Archive User Modal
+function showArchiveModal(userId) {
+    document.getElementById('archiveUserId').value = userId;
+    document.getElementById('archiveModal').style.display = 'block';
+}
+
+function closeArchiveModal() {
+    document.getElementById('archiveModal').style.display = 'none';
+}
+
+// Delete User Modal
+function showDeleteModal(userId) {
+    document.getElementById('deleteUserId').value = userId;
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}

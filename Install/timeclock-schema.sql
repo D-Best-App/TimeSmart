@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS `pending_edits`;
 DROP TABLE IF EXISTS `settings`;
 DROP TABLE IF EXISTS `admins`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `Offices`;
+DROP TABLE IF EXISTS `user-archive`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ===== Tables =====
@@ -125,6 +127,35 @@ CREATE TABLE `login_logs` (
   PRIMARY KEY (`ID`),
   KEY `EmployeeID` (`EmployeeID`),
   CONSTRAINT `login_logs_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `users` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `Offices` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `OfficeName` varchar(255) NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user-archive` (
+  `ID` int(11) NOT NULL,
+  `LastName` varchar(255) NOT NULL,
+  `Email` varchar(255) DEFAULT NULL,
+  `FirstName` varchar(255) NOT NULL,
+  `Pass` varchar(255) DEFAULT NULL,
+  `TagID` varchar(50) DEFAULT NULL,
+  `ProfilePhoto` varchar(255) DEFAULT NULL,
+  `ClockStatus` varchar(255) DEFAULT NULL,
+  `Office` varchar(100) DEFAULT NULL,
+  `TwoFASecret` varchar(255) DEFAULT NULL,
+  `TwoFAEnabled` tinyint(1) DEFAULT 0,
+  `RecoveryCodeHash` varchar(255) DEFAULT NULL,
+  `AdminOverride2FA` tinyint(1) DEFAULT 1,
+  `JobTitle` varchar(100) DEFAULT NULL,
+  `PhoneNumber` varchar(20) DEFAULT NULL,
+  `ThemePref` varchar(10) DEFAULT 'light',
+  `TwoFARecoveryCode` text DEFAULT NULL,
+  `LockOut` TINYINT(1) NOT NULL DEFAULT 0,
+  `ArchivedAt` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ===== Seed default admin (bcrypt hash) =====
