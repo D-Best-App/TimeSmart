@@ -46,3 +46,8 @@
 .actions-menu.active .actions-menu-content {
     display: block;
 }
+
+.actions-menu-content.up {
+    bottom: 100%;
+    top: auto;
+}

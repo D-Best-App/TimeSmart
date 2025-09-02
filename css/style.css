@@ -16,7 +16,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #000080;
+  background-color: #073851;
   padding: 12px 20px;
   color: #FFFFFF;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -116,7 +116,7 @@ body {
 .main h2 {
   margin-bottom: 20px;
   font-size: 22px;
-  color: #126ab3;
+  color: #1f5a78;
 }
 
 /* 📊 Table */
@@ -142,7 +142,7 @@ th {
 }
 
 td a {
-  color: #0078d7;
+  color: #073851;
   text-decoration: none;
   font-weight: bold;
 }
@@ -207,7 +207,7 @@ input[type="time"] {
   margin-top: 15px;
   padding: 8px 20px;
   font-weight: bold;
-  background-color: #0d6efd;
+  background-color: #073851;
   color: white;
   border: none;
   border-radius: 6px;
@@ -215,7 +215,7 @@ input[type="time"] {
 }
 
 .popup-content button:hover {
-  background-color: #0b5ed7;
+  background-color: #042a3d;
 }
 
 .hidden {
@@ -283,7 +283,7 @@ input[type="time"] {
   padding: 10px 15px;
   border: none;
   border-radius: 6px;
-  background-color: #0078d7;
+  background-color: #073851;
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -291,7 +291,7 @@ input[type="time"] {
 }
 
 .modal-content button:hover {
-  background-color: #005fa3;
+  background-color: #042a3d;
 }
 
 /* Align punch action buttons in two columns */
@@ -373,7 +373,7 @@ input[type="time"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #000080;
+    background-color: #073851;
     color: white;
     padding: 10px 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -396,7 +396,7 @@ input[type="time"] {
     left: 0;
     right: 0;
     height: 60px;
-    background-color: #000080;
+    background-color: #073851;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -477,14 +477,14 @@ input[type="time"] {
 }
 
 .mobile-menu-content a {
-  color: #126ab3;
+  color: #1f5a78;
   text-decoration: none;
   font-size: 18px;
   font-weight: 600;
 }
 
 .mobile-menu-content a:hover {
-  color: #0b4e8c;
+  color: #042a3d;
 }
 
 .close-mobile-menu {
@@ -499,7 +499,7 @@ input[type="time"] {
 }
 
 footer {
-  background-color: #000080;
+  background-color: #073851;
   color: #FFFFFF;
   text-align: center;
   padding: 1rem 2rem;
