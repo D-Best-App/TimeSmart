@@ -1,5 +1,5 @@
 :root {
-            --primary-color: #000080;
+            --primary-color: #073851;
         }
 
         body {
@@ -44,7 +44,7 @@
             margin-top: 30px;
             text-align: center;
             padding: 1rem;
-            background: #000080;
+            background: #073851;
             color: #FFFFFF;
             font-size: 14px;
         }

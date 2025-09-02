@@ -4,7 +4,7 @@ body {
             margin: 0;
         }
         header {
-            background-color: #000080;
+            background-color: #073851;
             color: white;
             padding: 2rem 1rem 0.5rem;
             text-align: center;
@@ -19,7 +19,7 @@ body {
             font-weight: bold;
         }
         nav {
-            background-color: #000080;
+            background-color: #073851;
             text-align: center;
             padding: 0.75rem 1rem;
             margin-top: 0;
