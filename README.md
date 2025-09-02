@@ -1,80 +1,103 @@
-# D-BEST TimeSmart
+# 🕒 D-BEST TimeSmart
 
-D-BEST TimeSmart is a web-based time clock application designed to manage employee time attendance records efficiently. It provides functionalities for employees to clock in/out and for administrators to manage users, view reports, and export data.
+**D-BEST TimeSmart** is a modern, web-based time clock application built for small businesses, schools, and organizations needing efficient time tracking and user management. It supports employees clocking in/out and offers powerful tools for administrators to manage users, view reports, and export data — all in a secure and user-friendly interface.
 
-## Features
+---
 
-*   **Employee Time Tracking:** Clock-in and clock-out functionality.
-*   **User Management:** Add, edit, and manage employee accounts.
-*   **Admin Dashboard:** Overview of time clock activities.
-*   **Reporting:** Generate attendance reports, summaries, and export data (Excel, PDF).
-*   **Two-Factor Authentication (2FA):** Enhanced security for user logins.
-*   **Privacy Policy & Terms of Use:** Dedicated pages for legal information.
+## ✅ Key Features
 
-## Prerequisites
+- **🕘 Employee Time Tracking**  
+  Clock In, Lunch, Break, and Clock Out with GPS and device logging.
+  
+- **👥 User Management**  
+  Add, update, or remove employee accounts and manage permissions.
+  
+- **📊 Admin Dashboard**  
+  Get real-time overviews of employee activity and time logs.
+  
+- **📁 Reports & Exports**  
+  Generate and export attendance data (PDF, Excel, summary reports).
+  
+- **🔐 Two-Factor Authentication (2FA)**  
+  Built-in support for optional 2FA via email or SMS.
+  
+- **📄 Legal Pages**  
+  Includes Privacy Policy and Terms of Use pages.
 
-Before you begin, ensure you have the following installed on your system:
+---
 
-*   **Docker:** For running the application in a container.
-*   **MySQL Client:** For creating the database.
+## 🧰 Prerequisites
 
-## Installation
+Ensure the following are installed:
 
-Follow these steps to set up D-BEST TimeSmart using the installation script:
+- **Docker**  
+  Required for containerized deployment.
+  
+- **MySQL Client**  
+  Required to create the database during setup.
 
-1.  **Download and run the installation script:**
+---
 
-    You will need to have `root` or `sudo` privileges to run the installation script.
+## 🚀 Quick Installation
 
-    ```bash
-    curl -o install.sh https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/install.sh
-    chmod +x install.sh
-    sudo ./install.sh
-    ```
+Run the official installation script to deploy a new instance:
 
-2.  **Follow the on-screen prompts:**
+```bash
+curl -o install.sh https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/install.sh
+chmod +x install.sh
+sudo ./install.sh
+```
 
-    The script will guide you through the following steps:
-    *   **Enter the company name:** This will be used to name the Docker container and the database.
-    *   **Enter database credentials:** You will be prompted to enter the database host, user, and password.
-    *   **Create Docker container:** The script will ask for confirmation to create the Docker container. The script will pull the `dbest25/timesmart:latest` Docker image.
-    *   **Create database:** The script will ask for confirmation to create the database.
+### 🧩 What the script does:
 
-3.  **Access the Application:**
+- Prompts for **Company Name**, which sets the container/database name.
+- Asks for **Database Host, User, and Password**.
+- Downloads `docker-compose.yml` and SQL schema from GitHub.
+- Creates the Docker container from the image: `dbest25/timesmart:latest`
+- Initializes a new MySQL database (if requested).
 
-    Once the installation is complete, you can access the application. Since the container is running in bridge mode and the port is not exposed, you will need to find the IP address of the container to access it.
+---
 
-    You can find the IP address of the container by running the following command:
+## 🌐 Accessing the App
 
-    ```bash
-    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_name>
-    ```
+After installation, determine the container’s IP (if not using port mapping):
 
-    Replace `<container_name>` with the name of the container (e.g., `Timeclock-YourCompanyName`).
+```bash
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' Timeclock-<YourCompanyName>
+```
 
-    Open your web browser and navigate to `http://<container_ip_address>`.
+Replace `<YourCompanyName>` with your actual name used during setup.
 
-## Usage
+Then open in your browser:
 
-*   **Admin Login:**
-    *   Navigate to `http://<container_ip_address>/admin/login.php` to access the admin login page.
-    *   The default admin credentials are:
-        *   **Username:** admin
-        *   **Password:** password
-*   **Employee Login:**
-    *   Navigate to `http://<container_ip_address>/user/login.php` to access the employee login page.
-    *   Employees can log in with the credentials created by the administrator.
+```
+http://<container_ip>
+```
 
-## Troubleshooting
+---
 
-*   **`docker: command not found`:** Ensure that you have Docker installed correctly.
-*   **`mysql: command not found`:** Ensure that you have the MySQL client installed correctly.
-*   **Database Connection Error:** Double-check your database credentials during the installation process.
+## 👨‍💼 Admin Access
 
-## Contributing
+- URL: `http://<container_ip>/admin/login.php`
+- **Default Credentials:**
+  - Username: `admin`
+  - Password: `admin`
 
-Contributions are welcome! Please feel free to fork the repository, make your changes, and submit a pull request.
+You should change this password immediately after first login.
 
-## License
+---
 
-[Specify your license here, e.g., MIT License]
+## 👷 Employee Access
+
+- URL: `http://<container_ip>/user/login.php`
+- Credentials must be created by the administrator.
+
+---
+
+## 🛠️ Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `docker: command not found` | Install Docker and ensure it is in your PATH |
+| `mysql: command not found` | Install the MySQL/MariaDB client |
+| Database connection fails | Re-run the script and verify credentials are correct |

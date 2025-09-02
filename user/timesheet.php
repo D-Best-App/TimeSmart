@@ -14,7 +14,6 @@ while ($row = $result->fetch_assoc()) {
     $punches[] = $row;
 }
 ?>
-<?php endif; ?>
 <link rel="stylesheet" href="../css/user_timesheet.css">
 
 
