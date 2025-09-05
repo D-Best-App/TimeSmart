@@ -30,7 +30,7 @@ while ($row = $result->fetch_assoc()) {
     if (!$original) continue;
 
     // Check the pending_edits
-    foreach (['TimeIN', 'LunchStart', 'LunchEnd', 'TimeIN', 'TimeOut'] as $field) {
+    foreach (['TimeIN', 'LunchStart', 'LunchEnd', 'TimeOut'] as $field) {
         if (array_key_exists($field, $row) && !is_null($row[$field]) && $row[$field] !== '' && $row[$field] !== $original[$field]) {
             $edits[] = [
                 'ID' => $row['ID'],

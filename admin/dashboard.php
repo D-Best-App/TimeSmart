@@ -67,6 +67,18 @@ if ($statsResult && $statsRow = $statsResult->fetch_assoc()) {
 <header>
     <img src="/images/D-Best.png" alt="D-Best Logo" class="logo">
     <h1>Admin Dashboard</h1>
+    <nav>
+        <a href="dashboard.php" class="active">Dashboard</a>
+        <a href="view_punches.php">Timesheets</a>
+        <a href="summary.php">Summary</a>
+        <a href="reports.php">Reports</a>
+        <a href="manage_users.php">Users</a>
+        <a href="manage_offices.php">Offices</a>
+        <a href="attendance.php">Attendance</a>
+        <a href="manage_admins.php">Admins</a>
+        <a href="settings.php">Settings</a>
+        <a href="../logout.php">Logout</a>
+    </nav>
 </header>
 
 <div class="info-stats">
