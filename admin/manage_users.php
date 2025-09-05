@@ -75,6 +75,7 @@ while ($row = $offices_result->fetch_assoc()) {
         <a href="manage_offices.php">Offices</a>
         <a href="attendance.php">Attendance</a>
         <a href="manage_admins.php">Admins</a>
+        <a href="settings.php">Settings</a>
         <a href="../logout.php">Logout</a>
     </nav>
 </header>

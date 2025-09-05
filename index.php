@@ -31,7 +31,7 @@ $gpsQuery->close();
     <link rel="apple-touch-icon" href="images/D-Best-favicon.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="30">
+    <meta name="theme-color" content="#126ab3">
     <meta name="theme-color" content="#126ab3">
 </head>
 <body>
@@ -172,5 +172,17 @@ $gpsQuery->close();
   </p>
 </footer>
 
+<script>
+  let refreshTimeout;
+  function resetRefreshTimer() {
+    clearTimeout(refreshTimeout);
+    refreshTimeout = setTimeout(() => location.reload(), 30000);
+  }
+  document.addEventListener('mousedown', resetRefreshTimer);
+  document.addEventListener('mousemove', resetRefreshTimer);
+  document.addEventListener('keypress', resetRefreshTimer);
+  document.addEventListener('scroll', resetRefreshTimer);
+  resetRefreshTimer();
+</script>
 </body>
 </html>
