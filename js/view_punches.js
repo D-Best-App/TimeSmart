@@ -69,4 +69,7 @@
     document.querySelectorAll('input[type="time"]').forEach(input => {
         input.addEventListener('change', updateTotals);
     });
+
+    // Calculate totals on page load
+    updateTotals();
 });

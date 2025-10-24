@@ -14,24 +14,7 @@ $employeeList = $conn->query("SELECT ID, FirstName, LastName FROM users ORDER BY
 $from = $_GET['from'] ?? date('Y-m-d', strtotime('monday this week'));
 $to = $_GET['to'] ?? date('Y-m-d', strtotime('sunday this week'));
 $employeeID = $_GET['emp'] ?? '';
-$mode = $_GET['mode'] ?? 'view';
-
-if (isset($_GET['daterange'])) {
-    $dateRange = explode(' - ', $_GET['daterange']);
-    if (count($dateRange) == 2) {
-        $from_raw = $dateRange[0];
-        $to_raw = $dateRange[1];
-        $date_obj = DateTime::createFromFormat('m/d/Y', $from_raw);
-        if ($date_obj) {
-            $from = $date_obj->format('Y-m-d');
-        }
-        $date_obj = DateTime::createFromFormat('m/d/Y', $to_raw);
-        if ($date_obj) {
-            $to = $date_obj->format('Y-m-d');
-        }
-    }
-}
-
+$editMode = isset($_GET['mode']) && $_GET['mode'] === 'edit';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,8 +31,38 @@ if (isset($_GET['daterange'])) {
     <link rel="stylesheet" href="../css/timesheet.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
     <link rel="stylesheet" href="../css/view_punches.css">
-    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
-    <script src="../js/admin_timesheet_edit.js"></script>
+    <style>
+        .add-punch-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .add-punch-btn:hover {
+            background-color: #218838;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .date-input {
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
 
@@ -62,69 +75,178 @@ if (isset($_GET['daterange'])) {
         <a href="summary.php">Summary</a>
         <a href="reports.php">Reports</a>
         <a href="manage_users.php">Users</a>
-        <a href="manage_offices.php">Offices</a>
         <a href="attendance.php">Attendance</a>
         <a href="manage_admins.php">Admins</a>
-        <a href="settings.php">Settings</a>
         <a href="../logout.php">Logout</a>
     </nav>
 </header>
 
 <div class="dashboard-container">
     <div class="container">
-        <form method="GET" class="summary-filter" style="display: flex; align-items: flex-end; gap: 10px;">
-            <div class="field" style="flex: 1.5;">
-                <label>Date Range:</label>
-                <input type="text" name="daterange" id="daterange" value="<?= htmlspecialchars(date('m/d/Y', strtotime($from))) . ' - ' . htmlspecialchars(date('m/d/Y', strtotime($to))) ?>">
+        <form method="GET" class="summary-filter">
+            <div class="field">
+                <label>Date Range From:
+                    <input type="text" name="from" id="weekFrom" value="<?= htmlspecialchars(date('m/d/Y', strtotime($from))) ?>">
+                </label>
             </div>
-            <div class="field" style="flex: 1;">
-                <label>Employee:</label>
-                <select name="emp" required>
-                    <option value="">Select Employee</option>
-                    <?php while ($emp = $employeeList->fetch_assoc()): ?>
-                        <option value="<?= $emp['ID'] ?>" <?= ($emp['ID'] == $employeeID ? 'selected' : '') ?>>
-                            <?= htmlspecialchars($emp['FirstName'] . ' ' . $emp['LastName']) ?>
-                        </option>
-                    <?php endwhile; ?>
-                </select>
+            <div class="field">
+                <label>To:
+                    <input type="text" name="to" id="weekTo" value="<?= htmlspecialchars(date('m/d/Y', strtotime($to))) ?>">
+                </label>
             </div>
-            <?php if (!empty($employeeID)): ?>
-            <div class="field" style="flex: 1;">
-                <label for="mode-select">Mode:</label>
-                <select id="mode-select" onchange="location = this.value;">
-                    <option value="?daterange=<?= htmlspecialchars(date('m/d/Y', strtotime($from))) . ' - ' . htmlspecialchars(date('m/d/Y', strtotime($to))) ?>&emp=<?= $employeeID ?>&mode=view" <?= $mode == 'view' ? 'selected' : '' ?>>View</option>
-                    <option value="?daterange=<?= htmlspecialchars(date('m/d/Y', strtotime($from))) . ' - ' . htmlspecialchars(date('m/d/Y', strtotime($to))) ?>&emp=<?= $employeeID ?>&mode=edit" <?= $mode == 'edit' ? 'selected' : '' ?>>Edit</option>
-                </select>
+            <div class="field">
+                <label>Employee:
+                    <select name="emp" required>
+                        <option value="">Select Employee</option>
+                        <?php while ($emp = $employeeList->fetch_assoc()): ?>
+                            <option value="<?= $emp['ID'] ?>" <?= ($emp['ID'] == $employeeID ? 'selected' : '') ?>>
+                                <?= htmlspecialchars($emp['FirstName'] . ' ' . $emp['LastName']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </label>
             </div>
-            <?php endif; ?>
             <div class="buttons">
-                <button type="submit">Filter</button>
+                <button type="submit">Submit</button>
                 <a href="view_punches.php" class="btn-reset">Reset</a>
+                <?php if (!empty($employeeID)): ?>
+                    <?php if ($editMode): ?>
+                        <a href="view_punches.php?emp=<?= urlencode($employeeID) ?>&from=<?= urlencode(date('m/d/Y', strtotime($from))) ?>&to=<?= urlencode(date('m/d/Y', strtotime($to))) ?>" class="btn-reset">Exit Edit Mode</a>
+                    <?php else: ?>
+                        <a href="view_punches.php?emp=<?= urlencode($employeeID) ?>&from=<?= urlencode(date('m/d/Y', strtotime($from))) ?>&to=<?= urlencode(date('m/d/Y', strtotime($to))) ?>&mode=edit" class="add-punch-btn">Enter Edit Mode</a>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
         </form>
 
         <?php if (!empty($employeeID)): ?>
+        <?php if ($editMode): ?>
+            <button type="button" class="add-punch-btn" onclick="addNewPunch()">+ Add New Punch</button>
+        <?php endif; ?>
         
+        <form method="POST" action="save_punches.php">
+            <input type="hidden" name="employeeID" value="<?= $employeeID ?>">
+            <input type="hidden" name="from" value="<?= $from ?>">
+            <input type="hidden" name="to" value="<?= $to ?>">
 
-        <?php
-        $_GET['from'] = date('m/d/Y', strtotime($from));
-        $_GET['to'] = date('m/d/Y', strtotime($to));
+            <table class="timesheet-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Clock In</th>
+                        <th>Clock In Location</th>
+                        <th>Lunch Out</th>
+                        <th>Lunch Out Location</th>
+                        <th>Lunch In</th>
+                        <th>Lunch In Location</th>
+                        <th>Clock Out</th>
+                        <th>Clock Out Location</th>
+                        <th>Total</th>
+                        <th>Reason for Adjustment</th>
+                        <th><?= $editMode ? 'Actions' : 'Confirm' ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $start = new DateTime($from);
+                    $end = new DateTime($to);
+                    $interval = new DateInterval('P1D');
+                    $range = new DatePeriod($start, $interval, $end->modify('+1 day'));
 
-        switch ($mode) {
-            case 'edit':
-                include 'timesheet_edit.php';
-                break;
-            case 'add':
-                include 'timesheet_add.php';
-                break;
-            default:
-                include 'timesheet_view.php';
-                break;
-        }
-        ?>
+                    foreach ($range as $day):
+                        $date = $day->format('Y-m-d');
+
+                        $stmt = $conn->prepare("SELECT * FROM timepunches WHERE EmployeeID = ? AND Date = ? ORDER BY TimeIN");
+                        $stmt->bind_param("is", $employeeID, $date);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        
+                        if ($result->num_rows > 0):
+                            while ($punch = $result->fetch_assoc()):
+                                $clockIn   = !empty($punch['TimeIN'])      ? date('H:i', strtotime($punch['TimeIN']))     : '';
+                                $clockOut  = !empty($punch['TimeOut'])     ? date('H:i', strtotime($punch['TimeOut']))    : '';
+                                $lunchOut  = !empty($punch['LunchStart'])  ? date('H:i', strtotime($punch['LunchStart'])) : '';
+                                $lunchIn   = !empty($punch['LunchEnd'])    ? date('H:i', strtotime($punch['LunchEnd']))   : '';
+                    ?>
+                    <tr>
+                        <td><?= $day->format('m/d/Y') ?></td>
+                        <td><input type="time" name="clockin[<?= $punch['id'] ?>]" value="<?= $clockIn ?>" step="60"></td>
+                        <td>
+                            <?php if (!empty($punch['LatitudeIN']) && !empty($punch['LongitudeIN'])) : ?>
+                                <a href="https://www.google.com/maps?q=<?= $punch['LatitudeIN'] ?>,<?= $punch['LongitudeIN'] ?>" target="_blank" class="btn-view">View</a>
+                            <?php endif; ?>
+                        </td>
+                        <td><input type="time" name="lunchout[<?= $punch['id'] ?>]" value="<?= $lunchOut ?>" step="60"></td>
+                        <td>
+                            <?php if (!empty($punch['LatitudeLunchStart']) && !empty($punch['LongitudeLunchStart'])) : ?>
+                                <a href="https://www.google.com/maps?q=<?= $punch['LatitudeLunchStart'] ?>,<?= $punch['LongitudeLunchStart'] ?>" target="_blank" class="btn-view">View</a>
+                            <?php endif; ?>
+                        </td>
+                        <td><input type="time" name="lunchin[<?= $punch['id'] ?>]" value="<?= $lunchIn ?>" step="60"></td>
+                        <td>
+                            <?php if (!empty($punch['LatitudeLunchEnd']) && !empty($punch['LongitudeLunchEnd'])) : ?>
+                                <a href="https://www.google.com/maps?q=<?= $punch['LatitudeLunchEnd'] ?>,<?= $punch['LongitudeLunchEnd'] ?>" target="_blank" class="btn-view">View</a>
+                            <?php endif; ?>
+                        </td>
+                        <td><input type="time" name="clockout[<?= $punch['id'] ?>]" value="<?= $clockOut ?>" step="60"></td>
+                        <td>
+                            <?php if (!empty($punch['LatitudeOut']) && !empty($punch['LongitudeOut'])) : ?>
+                                <a href="https://www.google.com/maps?q=<?= $punch['LatitudeOut'] ?>,<?= $punch['LongitudeOut'] ?>" target="_blank" class="btn-view">View</a>
+                            <?php endif; ?>
+                        </td>
+                        <td class="total-cell" id="total-<?= $punch['id'] ?>"><?= htmlspecialchars($punch['TotalHours'] ?? '0.00') ?></td>
+                        <td>
+                            <select name="reason[<?= $punch['id'] ?>]" class="reason-dropdown">
+                                <option value="">Select reason...</option>
+                                <option value="Forgot to punch">Forgot to punch</option>
+                                <option value="Shift change">Shift change</option>
+                                <option value="System error">System error</option>
+                                <option value="Time correction">Time correction</option>
+                                <option value="Late arrival">Late arrival</option>
+                                <option value="Early departure">Early departure</option>
+                                <option value="Manual update">Manual update</option>
+                            </select>
+                        </td>
+                        <td>
+                            <?php if ($editMode): ?>
+                                <button type="button" class="delete-btn" onclick="deleteRow(this)" title="Delete this punch">✖</button>
+                            <?php else: ?>
+                                <button type="submit" name="confirm[]" value="<?= $punch['id'] ?>" class="confirm-btn">✔</button>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                    <tr>
+                        <td><?= $day->format('m/d/Y') ?></td>
+                        <td colspan="11">No punches for this day.</td>
+                    </tr>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <div class="totals">
+                <strong>Total Week:</strong> <span id="weekly-total">0.00h</span> |
+                <strong>Overtime:</strong> <span id="weekly-overtime">0.00h</span>
+            </div>
+            
+            <?php if ($editMode): ?>
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="add-punch-btn" style="font-size: 16px; padding: 12px 24px;">Save All Changes</button>
+                </div>
+            <?php endif; ?>
+        </form>
         <?php endif; ?>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
+<?php if ($editMode): ?>
+<script src="../js/admin_timesheet_edit.js?v=1761329402"></script>
+<?php else: ?>
+<script src="../js/view_punches.js?v=1761329562"></script>
+<?php endif; ?>
 
 </body>
 </html>

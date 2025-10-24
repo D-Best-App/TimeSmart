@@ -60,13 +60,14 @@ $result = getPunches($conn, $startDate, $endDate, $employeeID);
 
 // === CREATE SPREADSHEET ===
 $spreadsheet = new Spreadsheet();
-$spreadsheet->removeSheetByIndex(0); // we'll add sheets dynamically
+// Keep the default sheet for now, we'll handle it below
 
 $currentUser = '';
 $sheet = null;
 $rowNum = 2;
 $totalHours = 0;
 $rangeFormatted = date('m-d', strtotime($startDate)) . '_' . date('m-d', strtotime($endDate));
+$sheetsCreated = 0;
 
 while ($row = $result->fetch_assoc()) {
     $fullName = $row['FirstName'] . ' ' . $row['LastName'];
@@ -76,6 +77,7 @@ while ($row = $result->fetch_assoc()) {
         $sheet = $spreadsheet->createSheet();
         $sheet->setTitle(substr($fullName, 0, 31)); // Excel sheet name limit
         $rowNum = 2;
+        $sheetsCreated++;
 
         // Headers
         $headers = ['Employee', 'Date', 'Time In', 'Time Out', 'Lunch Start', 'Lunch End', 'Rounded Hours'];
@@ -124,6 +126,11 @@ while ($row = $result->fetch_assoc()) {
     $rowNum++;
 }
 
+// If we created separate sheets, remove the default empty sheet
+if ($separatePages && $sheetsCreated > 0) {
+    $spreadsheet->removeSheetByIndex(0);
+}
+
 // Add total row (last sheet only)
 if ($sheet) {
     $sheet->setCellValue("F{$rowNum}", 'Total Hours');
@@ -132,10 +139,12 @@ if ($sheet) {
 }
 
 // Set active sheet to first
-$spreadsheet->setActiveSheetIndex(0);
+if ($spreadsheet->getSheetCount() > 0) {
+    $spreadsheet->setActiveSheetIndex(0);
+}
 
 // Output Excel file
-$employeeLabel = !empty($employeeID) ? preg_replace('/[^a-zA-Z0-9]/', '', $row['LastName']) : 'All';
+$employeeLabel = !empty($employeeID) && isset($row) ? preg_replace('/[^a-zA-Z0-9]/', '', $row['LastName']) : 'All';
 $filename = "Payroll_{$employeeLabel}_{$rangeFormatted}.xlsx";
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
