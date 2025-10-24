@@ -15,9 +15,15 @@ D-BEST TimeSmart is a PHP-based employee timekeeping system with three main inte
 
 ### Development Environment
 
-This application runs in Docker. The container is typically not exposed on host ports (bridge mode).
+This application runs in Docker with **volume-mounted** application files for easy development.
 
 ```bash
+# Navigate to installation directory
+cd /opt/Timeclock-<CompanyName>
+
+# Update application (git pull + container restart)
+./deploy/scripts/update.sh
+
 # Find container IP address
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_name>
 
@@ -27,9 +33,17 @@ docker exec -it <container_name> /bin/bash
 # View logs
 docker logs <container_name>
 
+# Restart container (applies config changes)
+docker restart <container_name>
+
 # Restart services inside container
 docker exec <container_name> supervisorctl restart all
 ```
+
+**Development Workflow:**
+1. Edit files in `app/` directory on host
+2. Changes appear immediately in browser (no rebuild needed!)
+3. Use `docker restart` only if changing config files
 
 ### Database Operations
 
@@ -38,16 +52,20 @@ docker exec <container_name> supervisorctl restart all
 mysql -h <db_host> -u <db_user> -p<db_pass> <db_name>
 
 # Import schema
-mysql -h <db_host> -u <db_user> -p<db_pass> <db_name> < Install/timeclock-schema.sql
+mysql -h <db_host> -u <db_user> -p<db_pass> <db_name> < deploy/database/schema.sql
 
-# Backup database
+# Backup database (manual)
 mysqldump -h <db_host> -u <db_user> -p<db_pass> <db_name> > backup.sql
+
+# Backup database (automated script)
+./deploy/scripts/backup.sh
 ```
 
 ### Composer Dependencies
 
 ```bash
 # Install dependencies
+cd app/
 composer install
 
 # Update dependencies
@@ -60,11 +78,24 @@ composer update
 # - vlucas/phpdotenv (environment variables)
 ```
 
-### Deployment
+### Installation & Deployment
 
 ```bash
-# Run installation script (creates Docker container + database)
-bash <(curl -s https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Install/install.sh)
+# New installation (interactive)
+bash <(curl -s https://raw.githubusercontent.com/D-Best-App/Timesmart/main/deploy/scripts/install.sh)
+
+# Update existing installation
+cd /opt/Timeclock-<CompanyName>
+./deploy/scripts/update.sh
+
+# Backup databases
+./deploy/scripts/backup.sh
+
+# Manual installation
+git clone https://github.com/D-Best-App/Timesmart.git
+cd Timesmart
+# Edit docker-compose.yml with your settings
+docker compose up -d
 ```
 
 ## Architecture
@@ -83,36 +114,93 @@ bash <(curl -s https://raw.githubusercontent.com/D-Best-App/Timesmart/main/Insta
 
 ### Directory Structure
 
+**New Consolidated Structure:**
+
 ```
-/admin/           - Admin portal (22 files): manage_users.php, reports.php, edits_timesheet.php, etc.
-/user/            - Employee portal (10 files): dashboard.php, timesheet.php, settings.php, etc.
-/kiosk/           - Badge scanning interface with audio feedback
-/functions/       - Reusable utilities:
-                    - clock_action.php (497 LOC) - Core punch/clock logic
-                    - clock_handler.php - PIN verification (⚠️ SQL injection vulnerability)
-                    - get_setting.php - Settings retrieval
-                    - verify_pin.php - PIN validation
-/auth/            - db.php - Database connection via mysqli with timezone setting
-/Install/         - Deployment files: Dockerfile, docker-compose.yml, timeclock-schema.sql
-/css/             - 26 stylesheet files
-/js/              - 13 JavaScript files including kiosk logic
-/docs/            - privacy.php, terms.php, report.php
+Timeclock-<CompanyName>/
+├── app/                      # Application code (volume-mounted to /var/www/html)
+│   ├── admin/               # Admin portal (22 files): manage_users.php, reports.php, etc.
+│   ├── user/                # Employee portal (10 files): dashboard.php, timesheet.php, etc.
+│   ├── kiosk/               # Badge scanning interface with audio feedback
+│   ├── functions/           # Reusable utilities:
+│   │   ├── clock_action.php (497 LOC) - Core punch/clock logic
+│   │   ├── clock_handler.php - PIN verification (⚠️ SQL injection vulnerability)
+│   │   ├── get_setting.php - Settings retrieval
+│   │   └── verify_pin.php - PIN validation
+│   ├── auth/                # db.php - Database connection via mysqli with timezone setting
+│   ├── css/                 # 26 stylesheet files
+│   ├── js/                  # 13 JavaScript files including kiosk logic
+│   ├── images/              # Static assets
+│   ├── vendor/              # Composer dependencies
+│   ├── index.php            # Public dashboard
+│   ├── error.php            # Error page handler
+│   ├── composer.json        # PHP dependencies
+│   └── privacy.php, terms.php, report.php, etc.
+│
+├── deploy/                  # Deployment configuration (consolidated from Install/)
+│   ├── docker/
+│   │   ├── Dockerfile       # PHP 8.3-FPM + Nginx + Supervisor
+│   │   ├── nginx.conf       # Nginx configuration with Cloudflare real IP
+│   │   ├── supervisord.conf # Process management (PHP-FPM + Nginx)
+│   │   └── www.conf         # PHP-FPM pool configuration
+│   ├── database/
+│   │   ├── schema.sql       # Database schema with 8 tables
+│   │   └── create-timeclock-user.sql
+│   └── scripts/
+│       ├── install.sh       # Interactive installation (git clone + docker + db)
+│       ├── update.sh        # Update from git and restart container
+│       ├── backup.sh        # Automated database backup script
+│       └── remove.sh        # Cleanup script
+│
+├── docs/                    # Documentation
+│   ├── INSTALLATION.md      # Step-by-step installation guide
+│   ├── DEPLOYMENT.md        # Update, backup, maintenance procedures
+│   ├── CONFIGURATION.md     # Configuration reference (env vars, PHP, Nginx, DB)
+│   └── README.md            # User documentation
+│
+├── docker-compose.yml       # Container orchestration with volume mounts
+├── CLAUDE.md                # This file - developer documentation
+├── README.md                # Project overview
+└── CHANGELOG.md             # Version history
 ```
+
+**Key Changes from Old Structure:**
+- ✅ All application code in `app/` (was scattered in root)
+- ✅ All deployment files in `deploy/` (was `/Install/`)
+- ✅ Volume mounts allow live development (no rebuilds needed)
+- ✅ Comprehensive documentation in `docs/`
+- ✅ Scripts for install, update, backup in `deploy/scripts/`
 
 ### Configuration Management
 
-**Environment Variables (`.env` file):**
-- `DB_HOST` - Database server hostname
-- `DB_NAME` - Database name
+**Environment Variables (docker-compose.yml):**
+- `DB_HOST` - Database server hostname (default: `172.17.0.1`)
+- `DB_NAME` - Database name (format: `timeclock-companyname`)
 - `DB_USER` - Database username
 - `DB_PASS` - Database password
-- `DB_TIMEZONE` - Default: 'America/Chicago'
+- `DB_TIMEZONE` - Timezone (default: `America/Chicago`)
 
-Loaded once in `/auth/db.php` via `vlucas/phpdotenv`, accessed via `$_ENV` superglobal.
+Accessed in `/app/auth/db.php` via `$_ENV` superglobal. Set in `docker-compose.yml`:
+
+```yaml
+environment:
+  DB_HOST: 172.17.0.1
+  DB_NAME: timeclock-acme
+  DB_USER: timeclock
+  DB_PASS: secure_password
+  DB_TIMEZONE: America/Chicago
+```
 
 **Runtime Settings Table:**
 - `EnforceGPS` - Require GPS on clock actions (0/1)
-- Queried via `/functions/get_setting.php`
+- Queried via `/app/functions/get_setting.php`
+
+**Configuration Files:**
+- `docker-compose.yml` - Container config + environment variables
+- `deploy/docker/nginx.conf` - Nginx web server config
+- `deploy/docker/www.conf` - PHP-FPM pool config
+- `deploy/docker/supervisord.conf` - Process management
+- See [CONFIGURATION.md](docs/CONFIGURATION.md) for full reference
 
 ### Authentication Flow
 
@@ -325,3 +413,222 @@ header('Location: ../error.php?code=500&message=' . urlencode('Error description
 ```
 
 `error.php` renders styled error page with code and message.
+
+## Development Workflow
+
+### Making Changes
+
+With volume mounts, development is streamlined:
+
+1. **Edit files** in `app/` on host machine
+2. **Changes appear immediately** in browser (no rebuild!)
+3. **Test** in browser
+4. **Commit** when satisfied
+
+```bash
+cd /opt/Timeclock-YourCompany
+
+# Edit files
+nano app/admin/dashboard.php
+
+# Test in browser (refresh page)
+
+# Commit changes
+git add app/admin/dashboard.php
+git commit -m "Update dashboard UI"
+git push
+```
+
+### No More docker cp!
+
+**Old workflow (painful):**
+```bash
+# Edit file
+nano /path/to/file.php
+# Copy to container
+docker cp file.php container:/var/www/html/
+# Restart container
+docker restart container
+```
+
+**New workflow (easy):**
+```bash
+# Edit file
+nano app/file.php
+# Refresh browser - done!
+```
+
+### Updating Production
+
+```bash
+# On production server
+cd /opt/Timeclock-YourCompany
+./deploy/scripts/update.sh
+
+# Script will:
+# 1. Backup database (prompt)
+# 2. Git pull latest changes
+# 3. Update composer if needed
+# 4. Restart container
+# 5. Show success message
+```
+
+### Configuration Changes
+
+Config files require container restart:
+
+```bash
+# Edit nginx.conf
+nano deploy/docker/nginx.conf
+
+# Restart to apply
+docker restart Timeclock-YourCompany
+```
+
+## Documentation Structure
+
+Comprehensive documentation for all audiences:
+
+### For Users/Administrators
+
+1. **README.md** - Project overview, quick links
+2. **docs/INSTALLATION.md** - Installation guide
+   - Prerequisites
+   - Quick start (automated installer)
+   - Detailed manual installation
+   - Multi-company setup
+   - Troubleshooting
+
+### For DevOps/System Administrators
+
+3. **docs/DEPLOYMENT.md** - Operations guide
+   - Updating TimeSmart
+   - Backup and restore procedures
+   - Container management
+   - Production best practices
+   - Monitoring and maintenance
+   - Disaster recovery
+
+4. **docs/CONFIGURATION.md** - Configuration reference
+   - Environment variables
+   - Docker configuration
+   - PHP-FPM tuning
+   - Nginx configuration
+   - Database optimization
+   - Security settings
+
+### For Developers
+
+5. **CLAUDE.md** (this file) - Developer documentation
+   - Project architecture
+   - Database schema
+   - Security patterns
+   - Known issues
+   - Development workflow
+
+## Scripts Reference
+
+All deployment scripts in `deploy/scripts/`:
+
+### install.sh
+
+Interactive installation wizard:
+- Checks prerequisites (Docker, Git, MySQL)
+- Prompts for company name, database credentials
+- Clones repository
+- Configures docker-compose.yml
+- Creates database (optional)
+- Starts container
+- Shows access information
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/D-Best-App/Timesmart/main/deploy/scripts/install.sh)
+```
+
+### update.sh
+
+Update existing installation:
+- Checks git status
+- Prompts for backup confirmation
+- Pulls latest changes
+- Updates composer dependencies if needed
+- Restarts container
+- Shows what changed
+
+```bash
+cd /opt/Timeclock-YourCompany
+./deploy/scripts/update.sh
+```
+
+### backup.sh
+
+Automated database backup:
+- Backs up all `timeclock-*` databases
+- Compresses backups (gzip)
+- Rotates hourly backups (keeps last 8)
+- Creates daily backups at 8 PM
+- Can be scheduled via cron
+
+```bash
+# Configure credentials in script
+sudo nano deploy/scripts/backup.sh
+
+# Run manually
+sudo ./deploy/scripts/backup.sh
+
+# Schedule via cron (hourly)
+crontab -e
+# Add: 0 * * * * /opt/Timeclock-YourCompany/deploy/scripts/backup.sh
+```
+
+### remove.sh
+
+Clean removal of installation:
+- Stops and removes container
+- Optionally removes database
+- Optionally removes files
+
+```bash
+cd /opt/Timeclock-YourCompany
+./deploy/scripts/remove.sh
+```
+
+## File Reference
+
+Quick reference to key files:
+
+**Application Code** (`app/`):
+- `admin/` - Admin portal pages
+- `user/` - Employee portal pages
+- `kiosk/` - Badge scanning interface
+- `functions/` - Shared PHP functions
+- `auth/db.php` - Database connection singleton
+- `index.php` - Public status dashboard
+
+**Deployment** (`deploy/`):
+- `docker/Dockerfile` - Container image definition
+- `docker/nginx.conf` - Web server config
+- `docker/www.conf` - PHP-FPM config
+- `docker/supervisord.conf` - Process manager
+- `database/schema.sql` - Database schema
+- `scripts/*.sh` - Installation/management scripts
+
+**Configuration**:
+- `docker-compose.yml` - Container orchestration + env vars
+- `.gitignore` - Excluded files (vendor/, logs/, etc.)
+
+**Documentation**:
+- `README.md` - Project overview
+- `CLAUDE.md` - This file (developer docs)
+- `CHANGELOG.md` - Version history
+- `docs/INSTALLATION.md` - Installation guide
+- `docs/DEPLOYMENT.md` - Operations guide
+- `docs/CONFIGURATION.md` - Config reference
+
+## Getting Help
+
+- **Installation Issues**: See [docs/INSTALLATION.md](docs/INSTALLATION.md)
+- **Deployment/Updates**: See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- **Configuration**: See [docs/CONFIGURATION.md](docs/CONFIGURATION.md)
+- **Development**: Read this file (CLAUDE.md)
+- **GitHub Issues**: https://github.com/D-Best-App/Timesmart/issues
